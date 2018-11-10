@@ -72,6 +72,8 @@ gem 'websocket-client-simple'
 # authn-oidc
 gem 'openid_connect'
 
+gem 'silencer'
+
 group :development, :test do
   gem 'aruba'
   gem 'csr'

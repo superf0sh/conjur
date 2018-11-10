@@ -376,6 +376,7 @@ GEM
       activemodel
       railties (>= 3.2.0)
       sequel (>= 3.28, < 5.0)
+    silencer (1.0.1)
     simplecov (0.14.1)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -493,6 +494,7 @@ DEPENDENCIES
   sass-rails
   sequel-postgres-schemata
   sequel-rails
+  silencer
   simplecov
   slosilo (~> 2.1)
   spring
