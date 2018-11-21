@@ -156,6 +156,9 @@ cd ..
 export TAG="$(version_tag)"
 cd ci
 
+docker-compose pull || true
+docker-compose build || true
+
 if [[ $RUN_AUTHENTICATORS = true || $RUN_ALL = true ]]; then
   services="$services oidc-keycloak ldap-server"
   prepare_env_auth_oidc
