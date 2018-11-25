@@ -41,6 +41,9 @@ class ApplicationController < ActionController::API
     Sequel::Model.db.transaction do
       yield
     end
+  rescue => ex
+    logger.warn "#{ex}\n#{ex.backtrace.join "\n"}"
+    raise
   end
 
   def record_not_found e
