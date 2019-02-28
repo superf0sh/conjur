@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ## [1.7.0] - 2019-02-28
-### GA
+### GA Features
 #### Security
 - Reduced IAM authentication logging
 #### Changed
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 #### Added
 - Support for annotations on policy objects.
 
-### Pre-Alpha - OpenID Connect Authenticator
+### Pre-Alpha Features - OpenID Connect Authenticator
 #### Added
 - Enabled a hard coded user to authenticate with the OIDC authenticator.
 
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 #### Fixed
 - Insure audit events can handle an empty username.
 
-### Internal
+### Internal Features
 #### Changed
 - Refactored CI pipeline to improve Changelog validation.
 
