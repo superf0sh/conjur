@@ -5,12 +5,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Changed
-- Updated conjur-policy-parser to
-  [v3.0.3](https://github.com/conjurinc/conjur-policy-parser/blob/possum/CHANGELOG.md#v303).
-- Replaced `changelog` entrypoint in `ci/test` with a separate script. Building
-  the `conjur` and `conjur-test` images just to be able to install and run the
-  `parse_a_changelog` gem seemed a little heavyweight.
+
+## [1.7.0] - 2019-02-28
+### GA
+#### Security
+- Reduced IAM authentication logging
+#### Changed
+- Refactored authentication strategies
+#### Added
+- Support for annotations on policy objects.
+
+### Pre-Alpha - OpenID Connect Authenticator
+#### Added
+- Enabled a hard coded user to authenticate with the OIDC authenticator.
+
+#### Changed
+- Align OIDC classes and filenames.
+- Improved debugging.
+
+#### Fixed
+- Insure audit events can handle an empty username.
+
+### Internal
+#### Changed
+- Refactored CI pipeline to improve Changelog validation.
+
 
 ## [1.3.6] - 2019-02-19
 ### Changed
