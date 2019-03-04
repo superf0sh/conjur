@@ -23,6 +23,10 @@ require 'conjur_audit'
 
 module Possum
   class Application < Rails::Application
+    def self.is_asset_precompile?
+      ARGV.include?('assets:precompile')
+    end
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -42,6 +46,12 @@ module Possum
       Sequel::Model.db.extension :pg_array, :pg_inet, :pg_hstore
     rescue
       raise unless is_asset_precompile?
+    end
+
+    # Do not connect to the database during asset compilation
+    if is_asset_precompile?
+      ENV["DATABASE_URL"] = ""
+      config.sequel.skip_connect = true
     end
 
     config.encoding = "utf-8"
@@ -79,9 +89,5 @@ module Possum
     # ParamsParser can cause data from the body to end up in params and then
     # in logs. It's better to explicitly parse the body where needed.
     config.middleware.delete ActionDispatch::ParamsParser
-
-    def self.is_asset_precompile?
-      /assets:precompile/.match?(ARGV.join(' '))
-    end
   end
 end
