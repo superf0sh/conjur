@@ -21,7 +21,7 @@ gem 'sprockets', '~> 3.7.0', '>= 3.7.2'
 
 gem 'pg'
 gem 'sequel-postgres-schemata', require: false
-gem 'sequel-rails'
+gem 'sequel-rails', github: 'TalentBox/sequel-rails', branch: 'master'
 
 gem 'activesupport'
 gem 'base32-crockford'

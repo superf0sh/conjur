@@ -51,6 +51,14 @@ module Possum
     # Defaults to false in production and test, true otherwise.
     config.sequel.schema_dump = false
 
+    if ENV['DATABASE_REPLICA_URL']
+      config.sequel.servers = {
+        :read_only => {
+          :host => ENV['DATABASE_REPLICA_URL']
+        }
+      }
+    end
+
     # Token authentication is optional for authn routes, and it's not applied at all to authentication.
     config.middleware.use Conjur::Rack::Authenticator,
       optional: [
