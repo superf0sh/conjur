@@ -39,6 +39,9 @@ RUN ln -sf /opt/conjur-server/bin/conjurctl /usr/local/bin/
 
 ENV RAILS_ENV production
 
-RUN bundle exec rake assets:precompile 
+# The Rails initialization expects the data key to exist. We supply a
+# placeholder value so that the asset compilation can complete.
+RUN CONJUR_DATA_KEY=$(openssl rand -base64 32) \
+    bundle exec rake assets:precompile 
 
 ENTRYPOINT [ "conjurctl" ]
