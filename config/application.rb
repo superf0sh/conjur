@@ -43,7 +43,7 @@ module Possum
 
     config.sequel.after_connect = proc do
       Sequel.extension :core_extensions, :postgres_schemata
-      Sequel::Model.db.extension :pg_array, :pg_inet, :pg_hstore
+      Sequel::Model.db.extension :pg_array, :pg_inet, :pg_hstore, :server_block
     rescue
       raise unless is_asset_precompile?
     end

@@ -7,6 +7,8 @@ class PoliciesController < RestController
   before_action :current_user
   before_action :find_or_create_root_policy
 
+  around_action :run_on_master
+
   rescue_from Sequel::UniqueConstraintViolation, with: :concurrent_load
 
   def put
@@ -69,6 +71,12 @@ class PoliciesController < RestController
         message: "Concurrent policy load in progress, please retry"
       }
     }, status: :conflict
+  end
+
+  def run_on_master
+    Sequel::Model.db.with_server(:default) do
+      yield
+    end
   end
 
   # Delay in seconds to advise the client to wait before retrying on conflict.
