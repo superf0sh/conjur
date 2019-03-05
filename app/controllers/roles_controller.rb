@@ -36,7 +36,7 @@ class RolesController < RestController
     memberships = filtered_roles(role.direct_memberships_dataset(filter_params), membership_filter)
     render_dataset(memberships)
   end
-  
+
   # Find all members of this role.
   #
   # For each member, return the full details of the grant as a
@@ -123,14 +123,14 @@ class RolesController < RestController
   end
 
   def filter_params
-    request.query_parameters.slice(:search, :kind).symbolize_keys
-  end
-  
-  def render_params
-    params.slice(:limit, :offset).symbolize_keys
+    request.query_parameters.permit(:search, :kind).to_h.symbolize_keys
   end
 
-  def membership_filter        
+  def render_params
+    params.permit(:limit, :offset).to_h.symbolize_keys
+  end
+
+  def membership_filter
     filter = params[:filter]
     filter = Array(filter).map{ |id| Role.make_full_id id, account } if filter
     return filter
@@ -144,7 +144,7 @@ class RolesController < RestController
     resp = count_only?  ? count_payload(dataset) :
            block_given? ? yield(dataset)         : dataset.all
 
-    render json: resp    
+    render json: resp
   end
 
   def count_only?

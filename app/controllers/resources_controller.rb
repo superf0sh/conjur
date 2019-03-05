@@ -3,10 +3,10 @@
 class ResourcesController < RestController
   include FindResource
   include AssumedRole
-  
+
   def index
-    options = params.slice(:account, :kind, :limit, :offset, :search).symbolize_keys
-    
+    options = params.permit(:account, :kind, :limit, :offset, :search).to_h.symbolize_keys
+
     if params[:owner]
       ownerid = Role.make_full_id(params[:owner], account)
       options[:owner] = Role[ownerid] or raise Exceptions::RecordNotFound, ownerid
@@ -28,14 +28,14 @@ class ResourcesController < RestController
           eager(:policy_versions).
           all
       end
-  
+
     render json: result
   end
-  
+
   def show
     render json: resource
   end
-  
+
   def permitted_roles
     privilege = params[:privilege] || params[:permission]
     raise ArgumentError, "privilege" unless privilege
