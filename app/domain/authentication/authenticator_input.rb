@@ -26,18 +26,18 @@ module Authentication
       ::Authentication::Security::AccessRequest.new(
         webservice:              webservice,
         whitelisted_webservices: ::Authentication::Webservices.from_string(
-          @account,
+          self.account,
           enabled_authenticators || Authentication::Common.default_authenticator_name
         ),
-        user_id:                 @username
+        user_id:                 self.username
       )
     end
 
     def webservice
       @webservice ||= ::Authentication::Webservice.new(
-        account:            @account,
-        authenticator_name: @authenticator_name,
-        service_id:         @service_id
+        account:            self.account,
+        authenticator_name: self.authenticator_name,
+        service_id:         self.service_id
       )
     end
   end
