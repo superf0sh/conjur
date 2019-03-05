@@ -26,7 +26,7 @@ module Audit
     end
 
     structured_data({}) # provide a base for subclasses to merge from
-    
+
     def self.can_fail
       include CanFail
     end
@@ -38,9 +38,9 @@ module Audit
       SEVERITY_MAP[severity]
     end
 
-    SDID = ::Audit::SDID
+    SDID ||= ::Audit::SDID
 
-    SEVERITY_MAP = {
+    SEVERITY_MAP ||= {
       LOG_EMERG: :FATAL,
       LOG_ALERT: :FATAL,
       LOG_CRIT: :ERROR,

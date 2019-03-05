@@ -8,7 +8,7 @@ module Rotation
 
       class Password
 
-        PASSWORD_LENGTH_ANNOTATION = 'rotation/postgresql/password/length'
+        PASSWORD_LENGTH_ANNOTATION ||= 'rotation/postgresql/password/length'
 
         def initialize(password_factory: ::Rotation::Password, pg: ::PG)
           @password_factory = password_factory
