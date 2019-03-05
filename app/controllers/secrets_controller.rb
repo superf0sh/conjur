@@ -5,12 +5,12 @@ require 'English'
 class SecretsController < RestController
   include FindResource
   include AuthorizeResource
-  
-  before_filter :current_user
-  
+
+  before_action :current_user
+
   def create
     authorize :update
-    
+
     value = request.raw_post
 
     raise ArgumentError, "'value' may not be empty" if value.blank?
@@ -25,7 +25,7 @@ class SecretsController < RestController
       user: @current_user
     )).log_to Audit.logger
   end
-  
+
   def show
     authorize :execute
     version = params[:version]
@@ -51,16 +51,16 @@ class SecretsController < RestController
       raise Exceptions::RecordNotFound,
             variable_ids.find { |r| !variables.map(&:id).include?(r) }
     end
-    
+
     result = {}
 
     authorize_many variables, :execute
-    
+
     variables.each do |variable|
       unless (secret = variable.last_secret)
         raise Exceptions::RecordNotFound, variable.resource_id
       end
-      
+
       result[variable.resource_id] = secret.value
       audit_fetch variable
     end

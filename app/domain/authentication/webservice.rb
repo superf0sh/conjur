@@ -13,7 +13,8 @@ require 'types'
 
 module Authentication
   class Webservice < ::Dry::Struct
-    constructor_type :schema
+    # XXX: Do we need this?
+    # constructor_type :schema
 
     attribute :account,            ::Types::NonEmptyString
     attribute :authenticator_name, ::Types::NonEmptyString
