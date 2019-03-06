@@ -22,7 +22,7 @@ RUN apt-get update -y && \
                        unattended-upgrades \
                        update-notifier-common
 
-RUN gem install -N -v 1.16.1 bundler
+RUN gem install -N -v '~> 2.0' bundler
 
 RUN mkdir -p /opt/conjur-server
 

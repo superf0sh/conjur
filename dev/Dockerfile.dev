@@ -41,7 +41,7 @@ RUN cd ~ && \
     ln -sf /usr/local/share/${PHANTOM_JS}/bin/phantomjs /usr/local/bin && \
     phantomjs --version
 
-RUN gem install -N -v 1.16.2 bundler
+RUN gem install -N -v '~> 2.0' bundler
 
 RUN mkdir -p /src/conjur-server
 
