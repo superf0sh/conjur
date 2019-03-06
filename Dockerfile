@@ -42,6 +42,8 @@ ENV RAILS_ENV production
 # The Rails initialization expects the data key to exist. We supply a
 # placeholder value so that the asset compilation can complete.
 RUN CONJUR_DATA_KEY=$(openssl rand -base64 32) \
-    bundle exec rake assets:precompile 
+    bundle exec rake assets:precompile \
+    && chgrp -R 0 /opt/conjur-server \
+    && chmod -R g+rwX /opt/conjur-server
 
 ENTRYPOINT [ "conjurctl" ]
