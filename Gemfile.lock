@@ -27,6 +27,14 @@ GIT
       activesupport
       rest-client
 
+PATH
+  remote: engines/conjur_audit
+  specs:
+    conjur_audit (0.0.1)
+      pg
+      rails (~> 5.2.2)
+      sequel-rails (= 1.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -488,6 +496,7 @@ DEPENDENCIES
   conjur-policy-parser (>= 3.0.3)!
   conjur-rack (~> 4.0)
   conjur-rack-heartbeat
+  conjur_audit!
   csr
   cucumber
   database_cleaner

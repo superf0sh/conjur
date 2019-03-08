@@ -5,6 +5,12 @@ module ConjurAudit
     isolate_namespace ConjurAudit
     config.audit_database = ENV['AUDIT_DATABASE_URL']
 
+    initializer :audit, before: :load_config_initializers do
+      Rails.application.routes.append do
+        mount ConjurAudit::Engine, at: '/audit'
+      end
+    end
+
     initializer :connect_audit_database do
       if (db = config.audit_database)
         db = Sequel.connect db

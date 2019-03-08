@@ -46,9 +46,6 @@ gem 'conjur-rack', '~> 4.0'
 gem 'conjur-rack-heartbeat'
 gem 'rack-rewrite'
 
-# Putting this here currently confuses debify, so instead load it in application.rb
-# gem 'conjur_audit', path: 'engines/conjur_audit'
-
 gem 'simplecov', require: false
 
 gem 'sass-rails'
@@ -63,6 +60,13 @@ gem 'net-ldap'
 
 # for AWS rotator
 gem 'aws-sdk-iam', require: false
+
+# Allow bundler to resolve dependencies from engines
+Dir["engines/*/*.gemspec"].each do |gemspec|
+  dir_name = File.dirname(gemspec)
+  gem_name = File.basename(gemspec, File.extname(gemspec))
+  gem gem_name, path: dir_name
+end
 
 group :production do
   gem 'rails_12factor'
