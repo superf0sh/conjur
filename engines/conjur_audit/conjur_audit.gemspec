@@ -18,8 +18,8 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_dependency "pg"
-  s.add_dependency "rails", "~> 4.2.8"
-  s.add_dependency "sequel-rails", "~> 0.9.15"
+  s.add_dependency "rails", "~> 5.2.2"
+  s.add_dependency "sequel-rails", "= 1.0.1"
 
   s.add_development_dependency "rspec-rails", "~> 3.5.2"
 end
