@@ -7,28 +7,34 @@ class CertificateAuthorityController < RestController
   include BodyParser
 
   before_action :verify_ca
-  before_action :verify_host, only: :sign
-  before_action :verify_csr, only: :sign
   
   def sign    
-    certificate = certificate_authority.sign_csr(host, csr, ttl)
+    certificate = certificate_authority.sign(signing_params)
     render_certificate(certificate)
   end
 
   protected
 
   def verify_ca
-    raise RecordNotFound, "No CA #{service_id}" unless ca_resource
+    raise RecordNotFound, "There is no CA with ID: #{service_id}" unless ca_resource
   end
 
-  def verify_host
-    raise Forbidden unless current_user.allowed_to?('sign', ca_resource)
-    raise Forbidden, 'Requestor is not a host' unless requestor_is_host?
-  end
+  # def verify_host
+  #   return unless is_x509?
 
-  def verify_csr
-    raise Forbidden, 'CSR cannot be verified' unless csr.verify(csr.public_key)
-  end
+  #   raise Forbidden unless current_user.allowed_to?('sign', ca_resource)
+  #   raise Forbidden, 'Requestor is not a host' unless requestor_is_host?
+  # end
+
+  # def verify_csr
+  #   return unless is_x509?
+
+  #   raise Forbidden, 'CSR cannot be verified' unless csr.verify(csr.public_key)
+  # end
+
+  # def verify_principals
+  #   return unless is_ssh?
+  # end
 
   def render_certificate(certificate)
     respond_to do |format|
@@ -46,16 +52,30 @@ class CertificateAuthorityController < RestController
   end
 
   def certificate_authority
-    ::CA::CertificateAuthority.new(ca_resource)
+    ::CA::CertificateAuthorityFactory.create(ca_resource)
   end
 
-  def requestor_is_host?
-    current_user.kind == 'host'
+  def signing_params
+    certificate_authority.prepare_inputs(current_user, params)
+  rescue => error
+    raise Forbidden, "Invalid signing parameters: #{error}"
   end
 
-  def csr
-    @csr ||= OpenSSL::X509::Request.new(params[:csr])
-  end
+  # def requestor_is_host?
+  #   current_user.kind == 'host'
+  # end
+
+  # def csr
+  #   @csr ||= OpenSSL::X509::Request.new(params[:csr])
+  # end
+
+  # def public_key
+  #   @public_key ||= Net::SSH::KeyFactory.load_data_public_key(params[:public_key])
+  # end
+
+  # def principals
+  #   @principals ||= Array(params[:public_key])
+  # end
 
   def ca_resource
     identifier = Sequel.function(:identifier, :resource_id)
@@ -71,11 +91,11 @@ class CertificateAuthorityController < RestController
                      .first
   end
 
-  def host
-    @host ||= Resource
-              .where(resource_id: current_user.id)
-              .first
-  end
+  # def host
+  #   @host ||= Resource
+  #             .where(resource_id: current_user.id)
+  #             .first
+  # end
 
   def service_id
     params[:service_id]
@@ -85,7 +105,15 @@ class CertificateAuthorityController < RestController
     params[:account]
   end
 
-  def ttl
-    ISO8601::Duration.new(params[:ttl]).to_seconds 
-  end
+  # def ttl
+  #   ISO8601::Duration.new(params[:ttl]).to_seconds 
+  # end
+
+  # def is_x509?
+  #   certificate_authority.type == :x_509
+  # end
+
+  # def is_ssh?
+  #   certificate_authority.type == :ssh
+  # end
 end

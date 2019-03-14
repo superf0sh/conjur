@@ -16,12 +16,24 @@ module CAHelpers
     int_ca
   end
 
+  def generate_ssh_ca(comment)
+    SshKey.new(comment)
+  end
+
   def create_host(common_name)
     Host.new("CN=#{common_name}")
   end
 
+  def create_ssh_key(comment)
+    SshKey.new(comment)
+  end
+
   def intermediate_ca
     @intermediate_ca ||= {}
+  end
+
+  def ssh_ca
+    @ssh_ca ||= {}
   end
 
   def response_certificate
@@ -159,5 +171,21 @@ module CAHelpers
       @key = OpenSSL::PKey::RSA.new key_size
     end
   end
+
+  class SshKey
+    def initialize(comments, key_size: 4096)
+      @comments = comments
+      @key = OpenSSL::PKey::RSA.new key_size
+    end
+
+    def private_key
+      @key.to_blob()
+    end
+
+    def public_key
+      @key.public_key.to_blob()
+    end
+  end
 end
+
 World(CAHelpers)

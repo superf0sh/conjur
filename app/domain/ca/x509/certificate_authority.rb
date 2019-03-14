@@ -5,14 +5,14 @@ require 'securerandom'
 module CA
   # CertificateAuthority implements the signing capabilities
   # for a Conjur configure CA service
-  class CertificateAuthority
+  class x509CertificateAuthority
 
     attr_reader :service
 
     # Creates a Certificate Authority from a configured Conjur webservice
     # 
     # Params:
-    # - service: Conjure `Resource` representing the configured CA
+    # - service: Conjur `Resource` representing the configured CA
     #               webservice.
     def initialize(service)
       @service = service
