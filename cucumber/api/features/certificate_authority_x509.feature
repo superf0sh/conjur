@@ -81,10 +81,10 @@ Feature: Conjur signs certificates using a configured CA
 
   Scenario: I can receive the result directly as a PEM formatted certificate
     Given I login as "cucumber:host:bacon"
-    And I set the "Accept" header to "application/x-pem-file" 
+    And I set the "Accept" header to "text/plain"
     When I send a CSR for "bacon" to the "kitchen" CA with a ttl of "P6M" and CN of "bacon"
     Then the HTTP response status code is 201
-    And the HTTP response content type is "application/x-pem-file"
+    And the HTTP response content type is "text/plain"
     And the resulting pem certificate is valid according to the "kitchen" intermediate CA
     And the common name is "cucumber:kitchen:host:bacon"
     And the subject alternative names contain "DNS:bacon"

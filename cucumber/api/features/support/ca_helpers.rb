@@ -16,8 +16,8 @@ module CAHelpers
     int_ca
   end
 
-  def generate_ssh_ca(comment)
-    SshKey.new(comment)
+  def generate_ssh_ca(comment, password = nil)
+    SshKey.new(comment, password: password)
   end
 
   def create_host(common_name)
@@ -41,7 +41,7 @@ module CAHelpers
   end
 
   def certificate_response_body
-    @certificate_response_body ||= (certificate_response_type == 'pem' ? @result : @result['certificate'])
+    @certificate_response_body ||= (certificate_response_type == 'json' ? @result['certificate'] : @result)
   end
 
   def certificate_response_type
@@ -173,17 +173,18 @@ module CAHelpers
   end
 
   class SshKey
-    def initialize(comments, key_size: 4096)
+    def initialize(comments, key_size: 4096, password: nil)
       @comments = comments
       @key = OpenSSL::PKey::RSA.new key_size
+      @password = password
     end
 
     def private_key
-      @key.to_blob()
+      @password.to_s.empty? ? @key.to_pem : @key.to_pem(OpenSSL::Cipher::AES256.new(:CBC), @password)
     end
 
     def public_key
-      @key.public_key.to_blob()
+      @key.public_key.to_pem
     end
   end
 end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "base64"
+
 # Responsible for API calls to interact with a Conjur-configured
 # certificate authority (CA) service
 class CertificateAuthorityController < RestController
@@ -40,15 +42,19 @@ class CertificateAuthorityController < RestController
     respond_to do |format|
       format.json do
         render json: {
-          certificate: certificate.to_pem
+          certificate: certificate
         },
                status: :created
       end
 
-      format.pem do
-        render body: certificate.to_pem, content_type: 'application/x-pem-file', status: :created
+      format.text do
+        render body: certificate, content_type: 'text/plain', status: :created
       end
     end
+  end
+
+  def openssh(certificate) 
+    "#{certificate.ssh_type} #{Base64.encode64(certificate.to_blob)}"
   end
 
   def certificate_authority
@@ -60,22 +66,6 @@ class CertificateAuthorityController < RestController
   rescue => error
     raise Forbidden, "Invalid signing parameters: #{error}"
   end
-
-  # def requestor_is_host?
-  #   current_user.kind == 'host'
-  # end
-
-  # def csr
-  #   @csr ||= OpenSSL::X509::Request.new(params[:csr])
-  # end
-
-  # def public_key
-  #   @public_key ||= Net::SSH::KeyFactory.load_data_public_key(params[:public_key])
-  # end
-
-  # def principals
-  #   @principals ||= Array(params[:public_key])
-  # end
 
   def ca_resource
     identifier = Sequel.function(:identifier, :resource_id)
@@ -91,12 +81,6 @@ class CertificateAuthorityController < RestController
                      .first
   end
 
-  # def host
-  #   @host ||= Resource
-  #             .where(resource_id: current_user.id)
-  #             .first
-  # end
-
   def service_id
     params[:service_id]
   end
@@ -104,16 +88,4 @@ class CertificateAuthorityController < RestController
   def account
     params[:account]
   end
-
-  # def ttl
-  #   ISO8601::Duration.new(params[:ttl]).to_seconds 
-  # end
-
-  # def is_x509?
-  #   certificate_authority.type == :x_509
-  # end
-
-  # def is_ssh?
-  #   certificate_authority.type == :ssh
-  # end
 end

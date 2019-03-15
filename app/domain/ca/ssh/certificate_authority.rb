@@ -18,86 +18,64 @@ module CA
       @service = service
     end
 
-    # Signs a certificate signing request (CSR) returning the X.509
-    # certificate
-    #
-    # csr: OpenSSL::X509::Request. Certificate signing request to sign
-    # ttl: Integer. The desired lifetime, in seconds, for the 
-    #               certificate 
-    def sign_csr(role, csr, ttl)
-      csr_cert = OpenSSL::X509::Certificate.new
+    def prepare_inputs(role, params)
+
+      verify_permissions(role)
+
+      raise "Signing parameter 'public_key' is missing." unless params.key?(:public_key)
+      public_key = OpenSSL::PKey::RSA.new(params[:public_key])
+      #verify_public_key
+
+      raise "Signing parameter 'principals' is missing." unless params.key?(:principals)
+      principals = Array(params[:principals])
+      # verify_principals
+
+      ttl = ISO8601::Duration.new(params[:ttl]).to_seconds 
+
+      {
+        role: role,
+        public_key: public_key,
+        principals: principals,
+        ttl: ttl
+      }
+    end
+
+            # def verify_principals
+        #   return unless is_ssh?
+        # end
+
+    def sign(inputs)
+      cert = Net::SSH::Authentication::Certificate.new
 
       # Generate a random 20 byte (160 bit) serial number for the certificate
-      csr_cert.serial = SecureRandom.random_number(1<<160)
-
-      # This value is zero-based. This is a version 3 certificate.
-      csr_cert.version = 2
+      cert.serial = SecureRandom.random_number(1<<160)
 
       now = Time.now
-      csr_cert.not_before = now
-      csr_cert.not_after = now + [ttl, max_ttl].min 
-      csr_cert.subject = subject(role)
-      csr_cert.public_key = csr.public_key
-      csr_cert.issuer = certificate.subject
-  
-      extension_factory = OpenSSL::X509::ExtensionFactory.new
-      extension_factory.subject_certificate = csr_cert
-      extension_factory.issuer_certificate = certificate
-  
-      csr_cert.add_extension(
-        extension_factory.create_extension('basicConstraints', 'CA:FALSE')
-      )
-      csr_cert.add_extension(
-        extension_factory.create_extension('keyUsage', 'keyEncipherment,dataEncipherment,digitalSignature')
-      )
-      csr_cert.add_extension(
-        extension_factory.create_extension('subjectKeyIdentifier', 'hash')
-      )
+      cert.valid_after = now
+      cert.valid_before = now + [inputs[:ttl], max_ttl].min 
+      cert.valid_principals = inputs[:principals]
 
-      csr_cert.add_extension(
-        extension_factory.create_extension("subjectAltName", subject_alt_name(role))
-      )
+      # TODO: Infer type from requester
+      cert.type = :user
 
-      csr_cert.sign private_key, OpenSSL::Digest::SHA256.new
-      csr_cert
+
+      # TODO: Figure out what these are
+      cert.extensions = {}
+      cert.critical_options = {}
+
+      cert.key_id = inputs[:role].id
+      cert.key = inputs[:public_key]
+
+      cert.sign!(private_key)
+
+      "#{cert.ssh_type} #{Base64.encode64(cert.to_blob)}"
     end
 
     protected
 
-    def subject(role)
-      common_name = [
-        role.account,
-        service_id,
-        role.kind,
-        role.identifier
-      ].join(':')
-      OpenSSL::X509::Name.new [['CN', common_name]]
-    end
-
     def service_id
       # CA services have ids like 'conjur/<service_id>/ca'
       @service_id ||= service.identifier.split('/')[1]
-    end
-
-    def subject_alt_name(role)
-      [
-        "DNS:#{leaf_domain_name(role)}",
-        "URI:#{spiffe_id(role)}"
-      ].join(', ')
-    end
-
-    def leaf_domain_name(role)
-      role.identifier.split('/').last
-    end
-
-    def spiffe_id(role)
-      [
-        'spiffe://conjur',
-        role.account,
-        service_id,
-        role.kind,
-        role.identifier
-      ].join('/')
     end
 
     def private_key
@@ -131,7 +109,11 @@ module CA
     end
 
     private
-        
+    
+    def verify_permissions(role)
+      raise "Role is not authorized to sign." unless role.allowed_to?('sign', @service)
+    end
+
     def certificate_chain_var
       @service.annotation('ca/certificate-chain')
     end

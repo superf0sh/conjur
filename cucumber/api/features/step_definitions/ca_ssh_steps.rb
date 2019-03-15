@@ -1,4 +1,4 @@
-Given(/^I have an ssh CA "([^"]*)"$/) do |ca_name|
+Given(/^I have an ssh CA "([^"]*)"(?: with password "([^"]*)")?$/) do |ca_name, password|
   ssh_ca[ca_name] ||= generate_ssh_ca(ca_name)
 end
 
@@ -15,7 +15,7 @@ When(/^I send a public key for "([^"]*)" to the "([^"]*)" CA with a ttl of "([^"
   path = "/ca/cucumber/#{service_name}/sign"
 
   body = <<~BODY
-    ttl=#{ttl}&public_key=#{CGI.escape(host.public_key)}
+    ttl=#{ttl}&public_key=#{CGI.escape(host.public_key)}&principals=ubuntu
   BODY
   try_request false do
     post_json path, body
@@ -23,5 +23,9 @@ When(/^I send a public key for "([^"]*)" to the "([^"]*)" CA with a ttl of "([^"
 end
 
 Then(/^the resulting (pem|json|openssh) certificate is valid according to the "([^"]*)" ssh CA$/) do |type, ca_name|
+  @certificate_response_type = type
+
+  puts @result
+
   pending # Write code here that turns the phrase above into concrete actions
 end
