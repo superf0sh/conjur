@@ -60,7 +60,10 @@ module CA
 
 
       # TODO: Figure out what these are
-      cert.extensions = {}
+      cert.extensions = {
+        "permit-pty" => ""
+      }
+
       cert.critical_options = {}
 
       cert.key_id = inputs[:role].id
