@@ -68,7 +68,7 @@ module CA
 
       cert.sign!(private_key)
 
-      "#{cert.ssh_type} #{Base64.encode64(cert.to_blob)}"
+      "#{cert.ssh_type} #{Base64.strict_encode64(cert.to_blob)}"
     end
 
     protected
